@@ -1,0 +1,67 @@
+---
+title: "Untitled"
+author: "Aditya Venkataraman"
+date: "4/9/2017"
+output: html_document
+---
+
+```{r}
+employment <- read.csv("Employment.csv")
+monthly <- read.csv("MonthlySample.csv")
+unemployment <- read.csv("Unemployment.csv")
+party <- read.csv("PartyControl.csv")
+```
+
+
+
+First pass at looking at the different parties against the unemployment/employment Ratio. 
+
+```{r}
+library(ggplot2)
+
+
+party$Senate <- as.factor(party$Senate)
+
+#Biased Romulan Unemployment
+romulan_prez_data <- subset(party, President == "R" & Star.Year > 2345 & Star.Year < 2357)
+
+
+#Romulan President Unemployment
+romulan_results2 <- ggplot(data = romulan_prez_data,aes(x=Star.Year, y=Unemp.Emp.Ratio))+geom_line()
+romulan_results2
+
+#Romulan Senate
+romulan_senate_data <- subset(party, Senate == "R " | Senate == "R")
+romulan_results3 <- ggplot(data = romulan_senate_data,aes(x=Star.Year, y=Unemp.Emp.Ratio))+geom_line()
+romulan_results3
+
+#Romulan HoR
+romulan_house_data <- subset(party, House == "R " | House == "R")
+romulan_results4 <- ggplot(data = romulan_house_data,aes(x=Star.Year, y=Unemp.Emp.Ratio))+geom_line()
+romulan_results4
+
+
+
+
+klingon_prez_data <- subset(party, President == "K")
+klingon_results1 <- ggplot(data = klingon_prez_data,aes(x=Star.Year, y=Unemp.Emp.Ratio))+geom_line()
+klingon_results1
+
+klingon_senate_data <- subset(party, Senate == "K ")
+klingon_results2 <- ggplot(data = klingon_senate_data,aes(x=Star.Year, y=Unemp.Emp.Ratio))+geom_line()
+klingon_results2
+
+klingon_house_data <- subset(party, House == "K ")
+klingon_results3 <- ggplot(data = klingon_house_data,aes(x=Star.Year, y=Unemp.Emp.Ratio))+geom_line()
+klingon_results3
+
+
+```
+
+
+Next Step would be to start looking into Combinations of these and looking into a more granular picture to get a mre accurate/distorted picture....
+
+```{r}
+
+```
+
