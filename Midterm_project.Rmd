@@ -10,6 +10,14 @@ employment <- read.csv("Employment.csv")
 monthly <- read.csv("MonthlySample.csv")
 unemployment <- read.csv("Unemployment.csv")
 party <- read.csv("PartyControl.csv")
+
+
+m1 <- merge(employment, unemployment, by.x = "Star.Year", by.y = "Star.Year")
+merged_f <- merge(m1,party,by.x = "Star.Year", by.y = "Star.Year")
+merged_f$Annual.Average.x <- NULL
+merged_f$Annual.Average.y <- NULL
+write.csv(merged_f,"party_all.csv")
+
 ```
 
 
@@ -18,12 +26,12 @@ First pass at looking at the different parties against the unemployment/employme
 
 ```{r}
 library(ggplot2)
-
+library(gridExtra)
 
 party$Senate <- as.factor(party$Senate)
 
 #Biased Romulan Unemployment
-romulan_prez_data <- subset(party, President == "R" & Star.Year > 2345 & Star.Year < 2357)
+romulan_prez_data <- subset(party, President == "R")
 
 
 #Romulan President Unemployment
@@ -51,9 +59,13 @@ klingon_senate_data <- subset(party, Senate == "K ")
 klingon_results2 <- ggplot(data = klingon_senate_data,aes(x=Star.Year, y=Unemp.Emp.Ratio))+geom_line()
 klingon_results2
 
-klingon_house_data <- subset(party, House == "K ")
+klingon_house_data <- subset(party, House == "K " & Star.Year < 2342)
 klingon_results3 <- ggplot(data = klingon_house_data,aes(x=Star.Year, y=Unemp.Emp.Ratio))+geom_line()
 klingon_results3
+
+
+
+
 
 
 ```
@@ -63,5 +75,89 @@ Next Step would be to start looking into Combinations of these and looking into 
 
 ```{r}
 
+
+plot1 <- ggplot(data = klingon_prez_data, aes(Star.Year)) + 
+      geom_point(aes(y = Unemp.Emp.Ratio, colour = "red"))
+
+plot1+geom_point(data = romulan_prez_data, aes(y = Unemp.Emp.Ratio, colour = "blue"))
+
+
+plot2 <- ggplot(data = merged_f, aes(Star.Year)) + 
+    geom_point(aes(y = Unemp.Emp.Ratio, color = President))
+plot2<-plot2+geom_line(aes(y = Unemp.Emp.Ratio),linetype="dotted")
+
+plot3 <- ggplot(data = merged_f, aes(Star.Year)) + 
+    geom_point(aes(y = Unemp.Emp.Ratio, color = Senate))
+plot3<-plot3+geom_line(aes(y = Unemp.Emp.Ratio),linetype="dotted")
+
+plot4 <- ggplot(data = merged_f, aes(Star.Year)) + 
+    geom_point(aes(y = Unemp.Emp.Ratio, color = House))
+plot4<-plot4+geom_line(aes(y = Unemp.Emp.Ratio),linetype="dotted")
+
+grid.arrange(plot2,plot3,plot4, ncol=1)
+
+
+
+diffvec <- diff(merged_f$Unemp.Emp.Ratio)
+diffvec <- c(0,diffvec)
+
+merged_f$diffv <- diffvec
+num_House <- as.numeric(substr(merged_f$House.Majority.., 1, 2))
+for(i in 1:65) 
+{
+  if(merged_f$House[i] == "R" | merged_f$House[i] == "R ")
+  {
+    
+    num_House[i] <- num_House[i] - 50
+  }
+  else{
+    num_House[i] <- 50 - num_House[i] 
+    
+  }
+
+}
+
+merged_f$house_skew <- num_House
+
+
+
+p<-ggplot(merged_f, aes(x=house_skew, y=diffv)) +
+  geom_point() +
+  lims(x=c(-20,20), y = c(-0.03,0.05)) +
+  theme_minimal() +  
+  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) 
+p
+
+
+
+
+num_Senate <- as.numeric(substr(merged_f$Senate.Majority.., 1, 2))
+for(i in 1:65) 
+{
+  if(merged_f$Senate[i] == "R" | merged_f$Senate[i] == "R ")
+  {
+    
+    num_Senate[i] <- num_Senate[i] - 50
+  }
+  else{
+    num_Senate[i] <- 50 - num_Senate[i] 
+    
+  }
+
+}
+
+merged_f$senate_skew <- num_Senate
+
+p2<-ggplot(merged_f, aes(x=senate_skew, y=diffv)) +
+  geom_point() +
+  lims(x=c(-10,18), y = c(-0.03,0.05)) +
+  theme_minimal() +  
+  geom_vline(xintercept = 0) + geom_hline(yintercept = 0) 
+p2
+
 ```
 
+
+Percent Change in Unemployement Rate, say senate or house changed one year, did the unemp.emp.ratio increase?
+  -Tryna compare percentage (either house or senate control) to percent change in unemp.emp.ratio.
+  -We care more about "by that year in power, what is the percent"
