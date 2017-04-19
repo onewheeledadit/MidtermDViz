@@ -18,9 +18,33 @@ merged_f$Annual.Average.x <- NULL
 merged_f$Annual.Average.y <- NULL
 write.csv(merged_f,"party_all.csv")
 
+
+ratio_mat <- unemployment[,2:13]/employment[,2:13]
+#ratio_mat[,1] <- employment[,1]
+ratio_mat <- data.frame(ratio_mat)
+ratio_mat$Star.Year <- employment$Star.Year
+write.csv(ratio_mat,"ratio_frame.csv")
+
+ratio_mat$prez <- merged_f$President
+ratio_mat$senate <- merged_f$Senate
+ratio_mat$house <- merged_f$House
+
+
+
+ratio_t <- data.frame(t(ratio_mat))
+write.csv(ratio_t,"ratio.csv")
+colnames(ratio_t) <- seq(2294,2358,1)
+
+colnames(ratio_mat) <- c("January","February","March", "April", "May", "June",
+                         "July", "August", "September","October","November","December","Star.Year")
+write.csv(ratio_mat,"ratio.csv")
+
 ```
 
 
+take unemployment and employment, divide and then 
+
+#LEFT OUTER JOIN
 
 First pass at looking at the different parties against the unemployment/employment Ratio. 
 
@@ -121,7 +145,7 @@ merged_f$house_skew <- num_House
 
 
 
-p<-ggplot(merged_f, aes(x=house_skew, y=diffv)) +
+p<-ggplot(merged_f[9:65,], aes(x=house_skew, y=diffv)) +
   geom_point() +
   lims(x=c(-20,20), y = c(-0.03,0.05)) +
   theme_minimal() +  
@@ -148,12 +172,31 @@ for(i in 1:65)
 
 merged_f$senate_skew <- num_Senate
 
-p2<-ggplot(merged_f, aes(x=senate_skew, y=diffv)) +
+p2<-ggplot(merged_f[13:65,], aes(x=senate_skew, y=diffv)) +
   geom_point() +
   lims(x=c(-10,18), y = c(-0.03,0.05)) +
   theme_minimal() +  
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) 
 p2
+
+
+
+employment_t <- t(employment)
+
+reshape <- function(df) {
+  fin <- c()
+  for(i in 1:65)
+  {
+    
+    
+    
+  }
+
+  
+  
+}
+
+
 
 ```
 
